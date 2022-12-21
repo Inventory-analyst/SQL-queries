@@ -1,0 +1,20 @@
+Here is a SQL query with a common table expression:
+
+SELECT DISTINCT (A.country),
+COUNT(DISTINCT D.customer_id) AS customer_count, total_payment
+FROM country A
+INNER JOIN city B ON A.country_id = B.country_id
+INNER JOIN address C ON B.city_id = C.city_id
+INNER JOIN customer D ON C.address_id = D.address_id
+LEFT JOIN (SELECT D.country,
+SUM (E.amount) AS total_payment
+FROM customer A
+INNER JOIN address B ON A.address_id = B.address_id
+INNER JOIN city C ON B.city_id = C.city_id
+INNER JOIN country D ON C.country_id = D.country_id
+INNER JOIN payment E ON A.customer_id = E.customer_id
+GROUP BY D.country
+ORDER BY total_payment DESC) AS top_customers
+ON A.country=top_customers.COUNTRY
+GROUP BY A.country, top_customers.COUNTRY,total_payment
+ORDER BY total_payment DESC
